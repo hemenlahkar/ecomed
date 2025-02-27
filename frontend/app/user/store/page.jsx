@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import MedicineCard from "../../components/MedicineCard";
 
@@ -94,10 +94,10 @@ const App = () => {
       </div>
 
       {showAddForm && (
-        <div 
-        onClick={handleOverlayClick}
-        className="fixed inset-0 bg-gray-800 backdrop-blur-sm flex items-center justify-center p-4"
-      >
+        <div
+          onClick={handleOverlayClick}
+          className="fixed inset-0 bg-gray-800 backdrop-blur-sm flex items-center justify-center p-4"
+        >
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h2 className="text-2xl font-bold text-emerald-800 mb-4">
               Add New Medicine
@@ -218,7 +218,9 @@ const App = () => {
         +
       </button>
 
-      {/* ... existing cart counter ... */}
+      <div className="fixed top-4 right-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-sm">
+        Cart: {cartCount}
+      </div>
     </div>
   );
 };
