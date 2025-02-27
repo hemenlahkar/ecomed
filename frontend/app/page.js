@@ -93,21 +93,21 @@ export default function Home() {
       id: 'dispose-safely',
       title: 'Dispose Safely',
       description: 'Safely dispose of your unused or expired medications at our designated collection points. Our eco-friendly disposal process ensures pharmaceuticals don\'t end up in water systems or landfills, protecting both the environment and public health.',
-      image: '/images/dispose-safely.jpg',
+      image: '/step01.webp',
       alt: 'Person disposing medication at a collection point'
     },
     {
       id: 'earn-carbon-credits',
       title: 'Earn Carbon Credits',
       description: 'Every time you properly dispose of medications through our service, you earn carbon credits. These credits reflect the positive environmental impact of your actions, as our process prevents harmful chemicals from contaminating soil and water resources.',
-      image: '/images/carbon-credits.jpg',
+      image: '/step02.webp',
       alt: 'Digital representation of carbon credits being earned'
     },
     {
       id: 'buy-discounted-medicine',
       title: 'Buy Medicine at a Discount',
       description: 'Redeem your accumulated carbon credits for discounts on future medication purchases. Our partner pharmacies offer exclusive discounts to reward your eco-conscious choices, making healthcare more affordable while you help protect the planet.',
-      image: '/images/medicine-discount.jpg',
+      image: '/step03.webp',
       alt: 'Person purchasing discounted medication at pharmacy'
     }
   ];
@@ -123,22 +123,22 @@ export default function Home() {
           <nav className="bg-black fixed top-2 my-4 h-[3rem] rounded-full w-[70vw] py-1 px-8 flex justify-between items-center z-99">
             <div className="logo font-bold Sigmar">EcoMed</div>
             <div className="routes flex gap-6">
-              <Link href="#" className="hover:text-teal-300 transition">Home</Link>
-              <Link href="#" className="hover:text-teal-300 transition">How it works ?</Link>
-              <Link href="#" className="hover:text-teal-300 transition">About us</Link>
+              <Link href="#" className="hover:text-teal-300 transition cursor-pointer">Home</Link>
+              <Link href="#" className="hover:text-teal-300 transition cursor-pointer">How it works ?</Link>
+              <Link href="#" className="hover:text-teal-300 transition cursor-pointer">About us</Link>
             </div>
             <div className="right-nav flex gap-2 items-center">
               <div className="notification">
-                <span className="material-symbols-outlined">notifications</span>
+                <span className="material-symbols-outlined cursor-pointer">notifications</span>
               </div>
-              <button className="bg-white rounded-4xl p-3 text-black h-[2rem] flex items-center">Login</button>
+              <button className="bg-white rounded-4xl p-3 text-black h-[2rem] flex items-center cursor-pointer">Login</button>
             </div>
           </nav>
           <div className="tagline flex flex-col items-end">
             <h1 className="text-white text-[4rem] anton">Earn Rewards</h1>
             <h1 className="text-white text-[4rem] anton">For Safe Medicine Disposal</h1>
-            <p className="">Dispose of expired medicines responsibly and earn Carbon Credits (CCT).</p>
-            <button className="bg-[#000] text-white rounded p-2 hover:bg-green-500 hover:text-black cursor-pointer">Dispose & Earn</button>
+            <p className=" text-[#000]">Dispose of expired medicines responsibly and earn Carbon Credits (CCT).</p>
+            <button className="bg-[#000] text-white rounded p-2 hover:text-green-500 hover:bg-white hover:font-bold cursor-pointer">Dispose & Earn</button>
           </div>
         </section>
         <section className="features flex items-center justify-evenly h-[10rem] z-10 absolute top-[88vh] left-[12rem] rounded-xl bg-[#fff] w-[70vw] mx-auto my-4 opacity-0 translate-y-10 text-green-500 font-semibold">
@@ -191,7 +191,7 @@ export default function Home() {
         {sections.map((section, index) => {
           const isEven = index % 2 === 0;
 
-          return (
+            return (
             <section 
               key={section.id}
               id={section.id}
@@ -200,37 +200,36 @@ export default function Home() {
               style={{ background: isEven ? '#f8fafc' : '#ffffff' }}
             >
               <div className="container mx-auto">
-                <div className={`flex flex-col ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-8 md:gap-16`}>
-                  <div className={`w-full md:w-1/2 image-content ${isEven ? 'order-last md:order-last' : 'order-first md:order-first'}`}>
-                    <div className="relative h-64 md:h-96 w-full rounded-xl overflow-hidden shadow-xl">
-                      <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 opacity-70"></div>
-                      <div className="absolute inset-0 flex items-center justify-center text-white">
-                        {/* Placeholder for actual images */}
-                        <p className="text-center px-4">
-                          [Image: {section.alt}]
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+              <div className={`flex flex-col ${index === 1 ? 'md:flex-row' : isEven ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-8 md:gap-16`}>
+              <div className={`w-full md:w-1/2 image-content ${index === 1 ? 'order-first md:order-first' : isEven ? 'order-last md:order-last' : 'order-first md:order-first'}`}>
+              <div className="relative h-64 md:h-96 w-full rounded-xl overflow-hidden shadow-xl">
+                <Image 
+                src={section.image}
+                alt={section.alt}
+                layout="fill"
+                objectFit="cover"
+                />
+              </div>
+              </div>
 
-                  <div className={`w-full md:w-1/2 text-content ${isEven ? 'order-first md:order-first' : 'order-last md:order-last'}`}>
-                    <div className="max-w-md mx-auto">
-                      <div className="inline-block bg-green-100 text-green-800 rounded-full px-4 py-1 text-sm font-semibold mb-4">
-                        Step {index + 1}
-                      </div>
-                      <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-800">{section.title}</h2>
-                      <p className="text-lg text-gray-700 leading-relaxed">{section.description}</p>
-                      <div className="mt-8">
-                        <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
-                          Learn More
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+              <div className={`w-full md:w-1/2 text-content ${index === 1 ? 'order-last md:order-last' : isEven ? 'order-first md:order-first' : 'order-last md:order-last'}`}>
+              <div className="max-w-md mx-auto">
+                <div className="inline-block bg-green-100 text-green-800 rounded-full px-4 py-1 text-sm font-semibold mb-4">
+                Step {index + 1}
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-800">{section.title}</h2>
+                <p className="text-lg text-gray-700 leading-relaxed">{section.description}</p>
+                <div className="mt-8">
+                <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                Learn More
+                </button>
                 </div>
               </div>
+              </div>
+              </div>
+              </div>
             </section>
-          );
+            );
         })}
 
 
