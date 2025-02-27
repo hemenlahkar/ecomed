@@ -22,3 +22,17 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.Poppins{
+  font-family: 'Poppins', sans-serif;
+}
+.Sigmar{
+  font-family: 'Sigmar One', cursive;
+}
+.anton{
+  font-family: 'Anton', sans-serif;
+}
+.landingPage{
+  background: rgb(0,131,2);
+background: linear-gradient(138deg, rgba(0,131,2,1) 0%, rgba(2,255,13,1) 49%, rgba(233,255,241,1) 100%);
+}
