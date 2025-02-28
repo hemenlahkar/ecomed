@@ -102,6 +102,7 @@ export default function Home() {
             <div className="routes flex gap-6">
               <Link href="#" className="hover:text-teal-300 transition cursor-pointer">Home</Link>
               <Link href="#" className="hover:text-teal-300 transition cursor-pointer">How it works ?</Link>
+              <Link href="/user/store" className="hover:text-teal-300 transition cursor-pointer">Store</Link>
               <Link href="#" className="hover:text-teal-300 transition cursor-pointer">About us</Link>
             </div>
             <div className="right-nav flex gap-2 items-center">
