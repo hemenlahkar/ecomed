@@ -1,19 +1,19 @@
 'use client';
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, useRef, useState } from "react";
 import Lenis from "@studio-freight/lenis";
 import Head from 'next/head';
 import Image from "next/image";
-
-gsap.registerPlugin(ScrollTrigger);
+import { usePrivy } from '@privy-io/react-auth';
 
 export default function Home() {
   const sectionRefs = useRef([]);
+  const [visible, setVisible] = useState(false);
+  const { login, authenticated, user, logout } = usePrivy();
 
   useEffect(() => {
+    // Initialize smooth scrolling with Lenis
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -26,62 +26,39 @@ export default function Home() {
 
     requestAnimationFrame(raf);
 
-    gsap.to(".features", {
-      scrollTrigger: {
-        trigger: ".features",
-        start: "top 80%", // Adjust the start position as needed
-        end: "bottom 60%", // Adjust the end position as needed
-        scrub: true,
-      },
-      opacity: 1,
-      y: 0,
-      duration: 1,
-    });
+    // Show features section after a short delay
+    setTimeout(() => {
+      setVisible(true);
+    }, 500);
 
-    // GSAP animations for each section
-    sectionRefs.current.forEach((section, index) => {
-      const isEven = index % 2 === 0;
-      const textEl = section.querySelector('.text-content');
-      const imageEl = section.querySelector('.image-content');
+    // Set up intersection observers for each section
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.2,
+    };
 
-      // Create a timeline for each section
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: "top center",
-          end: "bottom center",
-          toggleActions: "play none none reverse"
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('section-visible');
+        } else {
+          entry.target.classList.remove('section-visible');
         }
       });
+    }, observerOptions);
 
-      // Different animation based on even/odd section
-      if (isEven) {
-        tl.fromTo(textEl, 
-          { x: -100, opacity: 0 }, 
-          { x: 0, opacity: 1, duration: 1 }
-        ).fromTo(imageEl, 
-          { x: 100, opacity: 0 }, 
-          { x: 0, opacity: 1, duration: 1 }, 
-          "-=0.7"
-        );
-      } else {
-        tl.fromTo(imageEl, 
-          { x: -100, opacity: 0 }, 
-          { x: 0, opacity: 1, duration: 1 }
-        ).fromTo(textEl, 
-          { x: 100, opacity: 0 }, 
-          { x: 0, opacity: 1, duration: 1 }, 
-          "-=0.7"
-        );
+    sectionRefs.current.forEach(section => {
+      if (section) {
+        sectionObserver.observe(section);
       }
     });
 
     return () => {
       lenis.destroy();
-      sectionRefs.current.forEach((section) => {
+      sectionRefs.current.forEach(section => {
         if (section) {
-          const trigger = ScrollTrigger.getById(section.id);
-          if (trigger) trigger.kill();
+          sectionObserver.unobserve(section);
         }
       });
     };
@@ -131,17 +108,34 @@ export default function Home() {
               <div className="notification">
                 <span className="material-symbols-outlined cursor-pointer">notifications</span>
               </div>
-              <button className="bg-white rounded-4xl p-3 text-black h-[2rem] flex items-center cursor-pointer">Login</button>
+              {authenticated ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-white text-sm">{user?.email || 'User'}</span>
+                  <button 
+                    onClick={logout}
+                    className="bg-white rounded-4xl p-3 text-black h-[2rem] flex items-center cursor-pointer hover:bg-gray-200"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={login}
+                  className="bg-white rounded-4xl p-3 text-black h-[2rem] flex items-center cursor-pointer hover:bg-gray-200"
+                >
+                  Login
+                </button>
+              )}
             </div>
           </nav>
-          <div className="tagline flex flex-col items-end">
+          <div className="tagline flex flex-col items-end animate-fadeIn">
             <h1 className="text-white text-[4rem] anton">Earn Rewards</h1>
             <h1 className="text-white text-[4rem] anton">For Safe Medicine Disposal</h1>
             <p className=" text-[#000]">Dispose of expired medicines responsibly and earn Carbon Credits (CCT).</p>
-            <button className="bg-[#000] text-white rounded p-2 hover:text-green-500 hover:bg-white hover:font-bold cursor-pointer">Dispose & Earn</button>
+            <button className="bg-[#000] text-white rounded p-2 hover:text-green-500 hover:bg-white hover:font-bold cursor-pointer transition duration-300">Dispose & Earn</button>
           </div>
         </section>
-        <section className="features flex items-center justify-evenly h-[10rem] z-10 absolute top-[88vh] left-[12rem] rounded-xl bg-[#fff] w-[70vw] mx-auto my-4 opacity-0 translate-y-10 text-green-500 font-semibold">
+        <section className={`features flex items-center justify-evenly h-[10rem] z-10 absolute top-[88vh] left-[12rem] rounded-xl bg-[#fff] w-[70vw] mx-auto my-4 text-green-500 font-semibold transition-all duration-700 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           {/* Add your features content here */}
           <div className="eco-friendl relative w-[33%] flex flex-col gap-2 items-center justify-center">
             <Image 
@@ -174,7 +168,7 @@ export default function Home() {
           </div>
         </section>
         {/* How It Works Section */}
-        <section className="relative h-screen flex items-center justify-center text-center bg-gradient-to-b from-green-50 to-blue-50">
+        <section className="relative h-screen flex items-center justify-center text-center bg-gradient-to-b from-green-50 to-blue-50 animate-fadeIn">
           <div className="max-w-4xl px-6">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-green-800">How It Works</h1>
             <p className="text-lg md:text-xl text-gray-700 mb-8">
@@ -191,53 +185,50 @@ export default function Home() {
         {sections.map((section, index) => {
           const isEven = index % 2 === 0;
 
-            return (
+          return (
             <section 
               key={section.id}
               id={section.id}
               ref={el => sectionRefs.current[index] = el}
-              className="min-h-screen flex items-center py-16 px-4 md:px-8"
+              className={`min-h-screen flex items-center py-16 px-4 md:px-8 transition-all duration-1000 ease-out section-animation ${isEven ? 'even-section' : 'odd-section'}`}
               style={{ background: isEven ? '#f8fafc' : '#ffffff' }}
             >
               <div className="container mx-auto">
-              <div className={`flex flex-col ${index === 1 ? 'md:flex-row' : isEven ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-8 md:gap-16`}>
-              <div className={`w-full md:w-1/2 image-content ${index === 1 ? 'order-first md:order-first' : isEven ? 'order-last md:order-last' : 'order-first md:order-first'}`}>
-              <div className="relative h-64 md:h-96 w-full rounded-xl overflow-hidden shadow-xl">
-                <Image 
-                src={section.image}
-                alt={section.alt}
-                layout="fill"
-                objectFit="cover"
-                />
-              </div>
-              </div>
+                <div className={`flex flex-col ${index === 1 ? 'md:flex-row' : isEven ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-8 md:gap-16`}>
+                  <div className={`w-full md:w-1/2 image-content ${index === 1 ? 'order-first md:order-first' : isEven ? 'order-last md:order-last' : 'order-first md:order-first'}`}>
+                    <div className="relative h-64 md:h-96 w-full rounded-xl overflow-hidden shadow-xl">
+                      <Image 
+                        src={section.image}
+                        alt={section.alt}
+                        layout="fill"
+                        objectFit="cover"
+                      />
+                    </div>
+                  </div>
 
-              <div className={`w-full md:w-1/2 text-content ${index === 1 ? 'order-last md:order-last' : isEven ? 'order-first md:order-first' : 'order-last md:order-last'}`}>
-              <div className="max-w-md mx-auto">
-                <div className="inline-block bg-green-100 text-green-800 rounded-full px-4 py-1 text-sm font-semibold mb-4">
-                Step {index + 1}
+                  <div className={`w-full md:w-1/2 text-content ${index === 1 ? 'order-last md:order-last' : isEven ? 'order-first md:order-first' : 'order-last md:order-last'}`}>
+                    <div className="max-w-md mx-auto">
+                      <div className="inline-block bg-green-100 text-green-800 rounded-full px-4 py-1 text-sm font-semibold mb-4">
+                        Step {index + 1}
+                      </div>
+                      <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-800">{section.title}</h2>
+                      <p className="text-lg text-gray-700 leading-relaxed">{section.description}</p>
+                      <div className="mt-8">
+                        <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                          Learn More
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-800">{section.title}</h2>
-                <p className="text-lg text-gray-700 leading-relaxed">{section.description}</p>
-                <div className="mt-8">
-                <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
-                Learn More
-                </button>
-                </div>
-              </div>
-              </div>
-              </div>
               </div>
             </section>
-            );
+          );
         })}
 
-
-<section className="nearbypharamacy">
-  
-</section>
-
-
+        <section className="nearbypharamacy">
+          
+        </section>
 
         {/* Call to action section */}
         <section className="py-16 px-4 bg-gradient-to-r from-green-600 to-blue-600 text-white">
@@ -245,9 +236,18 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Get Started?</h2>
             <p className="text-lg mb-8 max-w-2xl mx-auto">Join our community of environmentally conscious individuals making a difference one medication at a time.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-white text-green-700 hover:bg-gray-100 font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300">
-                Sign Up Now
-              </button>
+              {authenticated ? (
+                <button className="bg-white text-green-700 hover:bg-gray-100 font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300">
+                  Go to Dashboard
+                </button>
+              ) : (
+                <button 
+                  onClick={login}
+                  className="bg-white text-green-700 hover:bg-gray-100 font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300"
+                >
+                  Sign Up Now
+                </button>
+              )}
               <button className="bg-transparent border-2 border-white hover:bg-white hover:text-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300">
                 Find Disposal Locations
               </button>
@@ -255,6 +255,57 @@ export default function Home() {
           </div>
         </section>
       </main>
+
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 1s ease-out forwards;
+        }
+        
+        .section-animation {
+          opacity: 0;
+          transform: translateY(50px);
+        }
+        
+        .section-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        
+        .even-section .text-content {
+          opacity: 0;
+          transform: translateX(-100px);
+          transition: opacity 1s ease, transform 1s ease;
+        }
+        
+        .even-section .image-content {
+          opacity: 0;
+          transform: translateX(100px);
+          transition: opacity 1s ease, transform 1s ease;
+        }
+        
+        .odd-section .image-content {
+          opacity: 0;
+          transform: translateX(-100px);
+          transition: opacity 1s ease, transform 1s ease;
+        }
+        
+        .odd-section .text-content {
+          opacity: 0;
+          transform: translateX(100px);
+          transition: opacity 1s ease, transform 1s ease;
+        }
+        
+        .section-visible .text-content,
+        .section-visible .image-content {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      `}</style>
     </>
   );
 }
