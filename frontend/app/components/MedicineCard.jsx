@@ -24,11 +24,11 @@ const MedicineCard = ({ medicine, addToCart }) => {
           
           <div className="flex items-center gap-2 mb-2">
             <span className="text-lg font-bold text-emerald-600">
-              ${(medicine.price * (1 - medicine.discount/100)).toFixed(2)}
+              ₹{(medicine.price * (1 - medicine.discount/100)).toFixed(2)}
             </span>
             {medicine.discount > 0 && (
               <span className="text-gray-500 line-through text-sm">
-                ${medicine.price}
+                ₹{medicine.price}
               </span>
             )}
           </div>
